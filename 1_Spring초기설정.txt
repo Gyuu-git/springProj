@@ -1,5 +1,9 @@
 마켓 > sts > spring 맨 위에꺼
 
+프로젝트 생성
+Spring Legacy Project > Spring MVC Project 
+> topLevelPackage(최상의 스프링 패키지인데 수업땐 kr.or.ddit로 통일)
+
 프로젝트 생성시
 프로젝트 Properties
 >> Deployment Assembly > Add > Java Build Path > Next > 비어있는거 확인
