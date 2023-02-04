@@ -1,0 +1,43 @@
+<bean id="dataSource" 
+		class="org.apache.commons.dbcp2.BasicDataSource"
+		destroy-method="close">
+		<property name="driverClassName" value="oracle.jdbc.driver.OracleDriver" />
+		<property name="url" value="jdbc:oracle:thin:@localhost:1521:xe" />
+		<property name="username" value="spring" />
+		<property name="password" value="java" />
+	</bean>
+
+<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="mapperLocations" value="classpath:/sqlmap/**/*_SQL.xml" />
+		<property name="configLocation" value="/WEB-INF/mybatisAlias/mybatisAlias.xml" />
+	</bean>
+
+<bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg index="0" ref="sqlSessionFactory" />
+	</bean>
+
+Java Resources > sql/main/resources 에 sqlmap 패키지 만들기
+src폴더 > main > webapp > WEB-INF에 mybatisAlias폴더 생성 
+> mybatisAlias.xml (Xml File) 생성
+
+
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+   <!-- 
+   [마이바티스] 스프링에서 "_"를 사용한 컬럼명을 사용 시(BOOK 테이블의 BOOK_ID)
+   카멜케이스로 읽어줌(bookId)
+   ex) 테이블 컬러명이 member_id인 경우 jsp화면단에서 이 값을 사용 시 memberId로 사용
+   -->
+   <settings>
+      <setting name="mapUnderscoreToCamelCase" value="true"/>
+   </settings>
+   <!-- 자주 사용하는 타입의 별칭을 세팅 -->
+   <typeAliases>   
+   </typeAliases>
+</configuration>
+
+붙여넣기 > Run As > Maven Build
