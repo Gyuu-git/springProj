@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- namespace : xml파일이 여러개일 수 있으므로 
+	이를 구별하기 위한 식별 용도로 사용
+-->
+<mapper namespace="lprod">
+	
+	<sql id="search">
+		<if test="keyword != null and keyword != ''">
+			AND(
+				   LPROD_ID LIKE '%'||#{keyword}||'%'
+				OR LPROD_GU LIKE '%'||#{keyword}||'%'
+				OR LPROD_NM LIKE '%'||#{keyword}||'%'
+			)
+		</if>
+	</sql>
+	
+	<!-- LPROD : ATTACH = 1 : N -->
+	<resultMap type="lprodVO" id="lprodMap">
+		<result property="lprodGu" column="LPROD_GU" />
+		<result property="lprodId" column="LPROD_ID" />
+		<result property="lprodNm" column="LPROD_NM" />
+		<collection property="attachVOList" resultMap="attachMap" />
+	</resultMap>
+	
+	<resultMap type="attachVO" id="attachMap">
+		<result property="etpId" column="ETP_ID" />
+		<result property="seq" column="SEQ" />
+		<result property="filename" column="FILENAME" />
+		<result property="filesize" column="FILESIZE" />
+		<result property="thumbnail" column="THUMBNAIL" />
+		<result property="regdate" column="REGDATE" />
+	</resultMap>
+	
+<!-- 	map{"size":"10", "currentPage":"1"} -->
+	<select id="list" parameterType="hashMap" resultType="lprodVO">
+		WITH U AS(
+		    SELECT ROW_NUMBER() OVER (ORDER BY LPROD_ID DESC) RNUM, T.*
+		    FROM (SELECT LPROD_ID, LPROD_GU, LPROD_NM
+		            FROM LPROD) T
+		    WHERE 1=1
+		    <include refid="search" />
+		)
+		SELECT U.*
+		FROM U
+		WHERE U.RNUM BETWEEN (#{currentPage} * #{size}) - (#{size} - 1) 
+		                 AND (#{currentPage} * #{size})
+	</select>
+	
+	<!-- 상품분류 자동생성 -->
+	<select id="getLprodId" resultType="int">
+		SELECT NVL(MAX(TO_NUMBER(LPROD_ID)), 0) + 1 FROM LPROD
+	</select>
+	
+	<!-- 상품분류코드 자동 생성 -->
+	<select id="getLprodGu" resultType="String">
+		SELECT SUBSTR(MAX(LPROD_GU), 1, 1)||(SUBSTR(MAX(LPROD_GU), 2)+1) FROM LPROD
+	</select>
+	
+	<!-- 상품분류 정보를 입력
+	lprodVO : LprodVO [lprodId=10, lprodGu=P404, lprodNm=dd]
+	insert/update/delete의 resultType은 생략(int)
+	
+	rok : 락커
+	-->
+	<insert id="createPost" parameterType="lprodVO">
+		<selectKey order="BEFORE" keyProperty="lprodId" resultType="int">
+			SELECT NVL(MAX(LPROD_ID),0)+1 FROM LPROD
+		</selectKey>
+		INSERT INTO LPROD(LPROD_ID, LPROD_GU, LPROD_NM)
+		VALUES(#{lprodId}, #{lprodGu}, #{lprodNm})
+	</insert>
+	
+	<!-- 상품분류 상세보기 
+	lprodVO(전) : lprodVO : LprodVO [lprodId=0, lprodGu=P404, lprodNm=null]
+
+	lprodVO(후) : lprodVO : LprodVO [lprodId=10, lprodGu=P404, lprodNm=커피]
+	-->
+	<select id="detail" parameterType="lprodVO" resultMap="lprodMap">
+		SELECT A.LPROD_ID, A.LPROD_GU, A.LPROD_NM, 
+				B.SEQ, B.FILENAME, B.FILESIZE, B.THUMBNAIL, B.REGDATE, B.ETP_ID
+		FROM LPROD A LEFT OUTER JOIN ATTACH B ON(A.LPROD_GU = B.ETP_ID)
+		WHERE A.LPROD_GU = #{lprodGu}
+		ORDER BY A.LPROD_ID, B.SEQ
+	</select>
+	
+	<!-- 상품분류 정보변경 
+		{"lprod : "10", "lprodGu" : "P404", "lprodNm" : "간식류변경"}
+	-->
+	<update id="updatePost" parameterType="lprodVO">
+		UPDATE LPROD
+		SET	   LPROD_NM = #{lprodNm}
+		WHERE  LPROD_GU = #{lprodGu} 
+	</update>
+	
+	<delete id="deletePost" parameterType="lprodVO">
+		DELETE FROM LPROD
+		WHERE LPROD_GU = #{lprodGu}
+	</delete>
+	
+	<!-- 첨부파일 등록 -->
+	<insert id="uploadFormAction" parameterType="attachVO">
+		<!-- rok : 락커 -->
+		<selectKey resultType="int" order="BEFORE" keyProperty="seq">
+			SELECT NVL(MAX(SEQ),0)+1 FROM ATTACH
+		</selectKey>
+		INSERT INTO ATTACH(SEQ, FILENAME, FILESIZE, THUMBNAIL, REGDATE)
+		VALUES(#{seq}, #{filename}, #{filesize}, #{thumbnail}, SYSDATE)
+	</insert>
+	
+	<!-- 다중 insert시 update 태그를 사용한다
+		드루와 : List<AttachVO> attachVOList
+		가즈아 : insert, update, delete의 경우 resultType은 생략
+	-->
+	<update id="createPostAttach" parameterType="java.util.List">
+		<!-- 
+		order="BEFORE"는 foreach 태그 실행 전에 selectKey부터 실행
+		-->
+		<selectKey resultType="int" order="BEFORE" keyProperty="seq">
+			SELECT NVL(MAX(SEQ),0)+1 FROM ATTACH
+		</selectKey>
+		<!-- index : 반복 시 index값. 0부터 시작 -->
+		<foreach collection="list" item="attachVO" 
+			open="INSERT ALL" close="SELECT * FROM DUAL" separator=" " index="idx">
+			INTO ATTACH(SEQ, FILENAME, FILESIZE, THUMBNAIL, REGDATE, ETP_ID)
+		    VALUES(#{idx} + #{seq}, #{attachVO.filename}, #{attachVO.filesize}, 
+		    		#{attachVO.thumbnail}, sysdate, #{attachVO.etpId})
+		</foreach>
+	</update>
+	
+	<!-- 전체 행의 수(total) -->
+	<select id="getTotal" parameterType="hashMap" resultType="int">
+		SELECT COUNT(*) 
+		FROM LPROD
+		WHERE 1=1
+		<include refid="search" />
+	</select>
+</mapper>

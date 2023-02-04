@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- namespace : xml파일이 여러개일 수 있으므로 
+	이를 구별하기 위한 식별 용도로 사용
+-->
+<mapper namespace="book">
+	<!-- MyBatis에서 제공해주는 데이터 입력을 나타내는 태그
+		1) 드루와 : Dao 객체가 던진 데이터 타입. parameterType만 씀
+		2) 가즈아 : Dao 객체의 메소드 쪽으로 리턴할 타입. insert/update/delete의 경우 생략(당연히 int)
+			- resultType : String, int, hashMap, VO
+			- resultMap : 1:N의 관계. MyBatis의 resultMap 태그를 사용
+	-->
+	<sql id="where">
+		<!-- 검색 -->
+		<if test="keyword!=null and keyword!=''">
+	    	AND(
+	    		   TITLE 	LIKE '%' || #{keyword} || '%'
+	    		OR CATEGORY LIKE '%' || #{keyword} || '%'
+	    		OR CONTENT  LIKE '%' || #{keyword} || '%'
+	    	)
+	    </if>
+	</sql>
+	
+	<resultMap type="bookVO" id="bookMap">
+		<result property="bookId" column="BOOK_ID" />
+		<result property="title" column="TITLE" />
+		<result property="category" column="CATEGORY" />
+		<result property="price" column="PRICE" />
+		<result property="insertDate" column="INSERT_DATE" />
+		<result property="content" column="CONTENT" />
+		<collection property="attachVOList" resultMap="attachMap" />
+	</resultMap>
+	
+	<resultMap type="attachVO" id="attachMap">
+		<result property="etpId" column="ETP_ID" />
+		<result property="seq" column="SEQ" />
+		<result property="filename" column="FILENAME"  />
+		<result property="filesize" column="FILESIZE" />
+		<result property="thumbnail" column="THUMBNAIL" />
+		<result property="regdate" column="REGDATE" />
+	</resultMap>
+	
+	<!-- 
+		(전) bookVO{bookId:0, title:개똥이글로리, category:소설, 
+				price:10000, insertDate:null, content:null}
+		(후) bookVO{bookId:1, title:개똥이글로리, category:소설, 
+				price:10000, insertDate:null, content:null}
+		MyBatis 쿼리 XML에 전달되면 #{멤버변수}로 작성하여 값으로 치환함
+	-->
+	<insert id="createPost" parameterType="bookVO">
+		<!-- 키를 높이면 락(rok)커가 될수 있을까? -->
+		<selectKey resultType="int" order="BEFORE" keyProperty="bookId">
+			SELECT NVL(MAX(BOOK_ID), 0)+1 FROM BOOK
+		</selectKey>
+		
+		insert into book(book_id, title, category, price, insert_date, content)
+		values(#{bookId}, #{title}, #{category}, #{price}, sysdate, #{content})
+	</insert>
+	
+	<!-- p.71 -->
+	<!-- 책 상세보기
+		select 태그는 조회(select) 쿼리를 실행하기 위한 mybatis 태그
+		드루와 : parameterType(book_SQL.xml로 드루와) - bookVO 타입
+		가즈아 : resultType(BookDao로 가즈아) - bookVO 타입
+		
+		(전) bookVO{bookId:2, title:null, category:null, 
+				price:0, insertDate:null, content:null}
+		(후) bookVO{bookId:2, title:개똥이글로리, category:소설, 
+				price:10000, insertDate:23/01/20, content:더글러리 후속작}
+	 -->
+	<select id="detail" parameterType="bookVO" resultMap="bookMap">
+		SELECT A.BOOK_ID, A.TITLE, A.CATEGORY, A.PRICE, A.INSERT_DATE, A.CONTENT, 
+		        B.SEQ, B.FILENAME, B.FILESIZE, B.THUMBNAIL, B.REGDATE, B.ETP_ID
+		FROM BOOK A, ATTACH B
+		WHERE TO_CHAR(A.BOOK_ID) = B.ETP_ID(+)
+		AND BOOK_ID = #{bookId}
+		ORDER BY A.BOOK_ID, B.SEQ
+	</select>
+	
+	<!-- 책 수정하기. update 태그는 update 쿼리를 실행하기 위한 mybatis 태그 -->
+	<!-- 
+	insert/update/delete의 경우 resultType 생략 가능(당연히 int)
+	 -->
+	<update id="updatePost" parameterType="bookVO">
+		update book
+		set TITLE=#{title}, CATEGORY=#{category}, PRICE=#{price}, 
+			INSERT_DATE=sysdate, CONTENT=#{content}
+		where book_id=#{bookId}
+	</update>
+	
+	<!-- parameterType : int, String, bookVO, hashMap 
+	BookVO [bookId=2, title=null, category=null, price=0, 
+			insertDate=null, content=null]
+	-->
+	<delete id="deletePost" parameterType="bookVO">
+		delete from book
+		where book_id in(#{bookId})
+	</delete>
+	
+	<!-- 
+	책 목록
+	parameterType : String keyword
+	
+	where 1 = 1은 늘 참(true)임
+	조건이 2개 이상일 때 where + and
+	조건이 1개일 때 where이어야 함
+	=>
+	조건이 2개 이상일 때 and + and
+	조건이 1개일 때		생략 + and이어야 함
+	-->
+	<select id="list" parameterType="hashMap" resultType="bookVO">
+		WITH T AS(
+		    SELECT ROW_NUMBER() OVER(ORDER BY BOOK_ID DESC) RNUM,
+		        BOOK_ID, TITLE, CATEGORY, PRICE, INSERT_DATE, CONTENT
+		    FROM BOOK
+		    WHERE 1=1
+		    <include refid="where" />
+		)
+		SELECT T.RNUM, T.BOOK_ID, T.TITLE, T.CATEGORY, 
+		        T.PRICE, T.INSERT_DATE, T.CONTENT 
+		FROM T
+		WHERE T.RNUM BETWEEN (#{currentPage} * #{size}) - (#{size} - 1) 
+		                 AND (#{currentPage} * #{size})
+	</select>
+	
+	<!-- 다중 insert시 update 태그를 사용한다
+		드루와 : List<AttachVO> attachVOList
+		가즈아 : insert, update, delete의 경우 resultType은 생략
+	-->
+	<update id="createPostAttach" parameterType="java.util.List">
+		<!-- 
+		order="BEFORE"는 foreach 태그 실행 전에 selectKey부터 실행
+		-->
+		<selectKey resultType="int" order="BEFORE" keyProperty="seq">
+			SELECT NVL(MAX(SEQ),0)+1 FROM ATTACH
+		</selectKey>
+		<!-- index : 반복 시 index값. 0부터 시작 -->
+		<foreach collection="list" item="attachVO" 
+			open="INSERT ALL" close="SELECT * FROM DUAL" separator=" " index="idx">
+			INTO ATTACH(SEQ, FILENAME, FILESIZE, THUMBNAIL, REGDATE, ETP_ID)
+		    VALUES(#{idx} + #{seq}, #{attachVO.filename}, #{attachVO.filesize}, 
+		    		#{attachVO.thumbnail}, sysdate, #{attachVO.etpId})
+		</foreach>
+	</update>
+	
+	<select id="getTotal" parameterType="hashMap" resultType="int">
+		SELECT COUNT(*) 
+		FROM BOOK
+	    WHERE 1=1
+		<include refid="where" />
+	</select>
+</mapper>

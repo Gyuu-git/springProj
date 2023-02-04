@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- namespace : xml파일이 여러개일 수 있으므로 
+	이를 구별하기 위한 식별 용도로 사용
+-->
+<mapper namespace="cus">
+	
+	<!-- 상품분류코드 자동 생성 -->
+	<select id="makeCusNum" resultType="String">
+		SELECT A.FRONT||
+		<![CDATA[
+		       CASE WHEN LENGTH(A.CN) < 3 THEN LPAD(A.CN,3,0) 
+	       ]]>
+		       ELSE TO_CHAR(A.CN) END AS CUS_NUM
+		FROM (SELECT NVL(SUBSTR(MAX(CUS_NUM), 1, 3), 'CUS') AS FRONT, 
+					 NVL(SUBSTR(MAX(CUS_NUM), 4), 0)+1 AS CN
+		        FROM CUS) A
+	</select>
+	
+</mapper>
