@@ -1,10 +1,13 @@
 package kr.or.ddit.vo;
 
+import java.util.Date;
 import java.util.List;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.NotBlank;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import lombok.Data;
 
@@ -19,7 +22,7 @@ import lombok.Data;
 */
 @Data
 public class CusVO {
-	@NotBlank
+	@NotBlank(message = "누나바보")
 	private String cusNum;	// 고객번호(필수=mandatory), null체크, trim 후 길이가 0인지 체크
 	@NotBlank
 	@Size(min = 2, max = 10, message = "2자 ~ 10자 이내로 입력해 주세요")
@@ -32,8 +35,18 @@ public class CusVO {
 	private String postNo;	// 우편번호
 	
 	private String addrDet;	// 주소 상세
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	private Date cusBir;	// 생일
+	
+	private List<String> hobbyList;	// 취미(여러개 선택)
+	private String hobby;
+	
+	private String gender;			// 성별(한개 선택)
+	
+	private String nationality;		// 국적(한개선택 -> select 박스
 	
 	// 고객(CUS) : 자동차(CAR) = 1 : N
+	@Valid
 	private List<CarVO> carVOList;
 	// 고객(CUS) : 서비스(SER) = 1 : N
 	private List<SerVO> serVOList;

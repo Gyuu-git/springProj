@@ -52,32 +52,37 @@
 			<div>
 				<label for="postNo" class="form-label">우편번호</label>
 			</div>
-			<input type="text" class="form-control" id="postNo" 
-					name="postNo" placeholder="우편번호를 입력해주세요"
-					style="width:80%; float:left;" />
+<!-- 			<input type="text" class="form-control" id="postNo"  -->
+<!-- 					name="postNo" placeholder="우편번호를 입력해주세요" -->
+<!-- 					style="width:80%; float:left;" /> -->
+			<form:input path="postNo" class="form-control" style="width:80%; float:left;" />
 			<input class="btn btn-info" type="button" value="우편번호 검색" 
 					style="width:20%; float:right;" onclick="openHomeSearch()" />
 		</div>
 		<div class="mb-3">
 			<label for="cusAddr" class="form-label">주소</label>
-			<input type="text" class="form-control" id="cusAddr" 
-					name="cusAddr" placeholder="주소를 입력해주세요">
+<!-- 			<input type="text" class="form-control" id="cusAddr"  -->
+<!-- 					name="cusAddr" placeholder="주소를 입력해주세요"> -->
+			<form:input path="cusAddr" class="form-control" />
 		</div>
 		<div class="mb-3">
 			<label for="addrDet" class="form-label">상세 주소</label>
-			<input type="text" class="form-control" id="addrDet" 
-					name="addrDet" placeholder="상세 주소를 입력해주세요">
+<!-- 			<input type="text" class="form-control" id="addrDet"  -->
+<!-- 					name="addrDet" placeholder="상세 주소를 입력해주세요"> -->
+			<form:input path="addrDet" class="form-control" />
 		</div>
 		<div class="mb-3">
 			<label for="cusPhe" class="form-label">연락처</label>
-			<input type="text" class="form-control" id="cusPhe" 
-					name="cusPhe" placeholder="연락처를 입력해주세요">
+<!-- 			<input type="text" class="form-control" id="cusPhe"  -->
+<!-- 					name="cusPhe" placeholder="연락처를 입력해주세요"> -->
+			<form:input path="cusPhe" class="form-control" />
 			<form:errors path="cusPhe" style="color: red;" />
 		</div>
 		<div class="mb-3">
 			<label for="cusBir" class="form-label">생일</label>
-			<input type="date" class="form-control" id="cusBir" 
-					name="cusBir" placeholder="생일을 입력해주세요">
+<!-- 			<input type="date" class="form-control" id="cusBir"  -->
+<!-- 					name="cusBir" placeholder="생일을 입력해주세요"> -->
+			<form:input path="cusBir" class="form-control" />
 			<form:errors path="cusBir" style="color: red;" />
 		</div>
 		<div class="mb-3">

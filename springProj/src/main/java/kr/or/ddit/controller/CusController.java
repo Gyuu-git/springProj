@@ -1,14 +1,24 @@
 package kr.or.ddit.controller;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import kr.or.ddit.service.CusService;
 import kr.or.ddit.vo.CusVO;
@@ -27,8 +37,33 @@ public class CusController {
 	// void로 응답
 	// 요청 URI : /cus/create
 	@GetMapping("/create")
-	public void create() {
+	public void create(@ModelAttribute CusVO cusVO, Model model) {
 		log.info("create()에 왔다");
+		
+		// 기본키 데이터 생성
+		String cusNum = this.cusService.getCusNum();
+		cusVO.setCusNum(cusNum);
+		cusVO.setCusNm("팬더");
+		
+		// 취미 등록
+		List<String> hobbyList = new ArrayList<>();
+		hobbyList.add("Music");
+		hobbyList.add("Movie");
+		hobbyList.add("Sports");
+		cusVO.setHobbyList(hobbyList);
+		
+		cusVO.setGender("female");
+		
+		// 국적(한개 선택) -> select 박스
+		Map<String, String> nationalityMap = new HashMap<>();
+		nationalityMap.put("Korea", "Korea");
+		nationalityMap.put("America", "America");
+		nationalityMap.put("Germany", "Germany");
+		
+		// 생성된 고객번호를 model에 넣음
+		model.addAttribute("cusNum", cusNum);
+		model.addAttribute("nationalityMap", nationalityMap);
+		
 		// forwarding
 //		return "cus/create";
 	}
@@ -44,20 +79,70 @@ public class CusController {
 	// @Valid는 CusVO의 validation 체크를 해주는 어노테이션
 	// 문제발생 시 Errors errors객체에 오류 정보를 담아서 꼭!!! forwarding해주면 됨
 	@PostMapping("/createPost")
-	public String createPost(@Valid @ModelAttribute CusVO cusVO, Errors errors) {
+	public String createPost(@Valid @ModelAttribute CusVO cusVO, 
+            String cusNum, String cusNm, String postNo, String cusAddr, String addrDet,
+            @RequestParam("cusPhe") String phone, 
+            @DateTimeFormat(pattern = "yyyy-MM-dd") Date cusBir,
+            String gender, String nationality, 
+            Errors errors) {
+		
+		log.info("cusVO : " + cusVO);
+		log.info("cusNum : " + cusNum + ", cusNm : " + cusNm + ", postNo : " + postNo
+				+ ", cusAddr : " + cusAddr + ", addrDet : " + addrDet + ", cusPhe : " + phone 
+				+ ", cusBir : " + cusBir);
+		
+		String hobby = "";
+		for(String str : cusVO.getHobbyList()) {
+			hobby += str + ",";
+		}
+		cusVO.setHobby(hobby);
 		
 		// errors.hasErrors() : 문제 발생 시 true
 		if(errors.hasErrors()) {
 			return "cus/create";
 		}
 		
-		// 고객번호는 CUS001, CUS002...
-		// 자동으로 다음 고객번호를 생성시켜보자
-		String cusNum = cusService.makeCusNum();
-		log.info("cusNum : " + cusNum);
-		cusVO.setCusNum(cusNum);
+		// CUS 테이블에 insert
+		int result = this.cusService.createPost(cusVO);
+		log.info("result : " + result);
 		
 		// 입력성공 : 상세보기로 redirect. 기본키 데이터를 파라미터로 보냄
 		return "redirect:/cus/detail?cusNum=" + cusVO.getCusNum();
+	}
+	
+	/* 컨트롤러 메서드 매개변수
+	- Model
+	- RedirectAttributes
+	- 자바빈즈 클래스
+	- MultipartFile
+	- BindingResult
+	- java.util.Locale
+	- java.security.Principal
+	*/
+	// 요청 URI : /cus/detail?cusNum=CUS003
+	@GetMapping("/detail")
+	public String detail(Model model, RedirectAttributes ras, @ModelAttribute CusVO cusVO) {
+		
+		// 상세보기
+		CusVO sel_cus = this.cusService.detail(cusVO);
+		log.info("sel_cus : " + sel_cus);
+		
+		cusVO.setCusNum(sel_cus.getCusNum());
+		cusVO.setCusNm(sel_cus.getCusNm());
+		cusVO.setCusAddr(sel_cus.getCusAddr());
+		cusVO.setCusBir(sel_cus.getCusBir());
+		cusVO.setCusPhe(sel_cus.getCusPhe());
+		cusVO.setGender(sel_cus.getGender());
+		
+		// 국적(한개 선택) -> select 박스
+		Map<String, String> nationalityMap = new HashMap<>();
+		nationalityMap.put("Korea", "Korea");
+		nationalityMap.put("America", "America");
+		nationalityMap.put("Germany", "Germany");
+		
+		model.addAttribute("nationalityMap", nationalityMap);
+		
+		// forwarding
+		return "cus/detail";
 	}
 }

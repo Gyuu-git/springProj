@@ -5,10 +5,10 @@
 <!-- namespace : xml파일이 여러개일 수 있으므로 
 	이를 구별하기 위한 식별 용도로 사용
 -->
-<mapper namespace="cus">
+<mapper namespace="kr.or.ddit.mapper.CusMapper">
 	
-	<!-- 상품분류코드 자동 생성 -->
-	<select id="makeCusNum" resultType="String">
+	<!-- 고객테이블(CUS)의 기본키 데이터 생성 -->
+	<select id="getCusNum" resultType="String">
 		SELECT A.FRONT||
 		<![CDATA[
 		       CASE WHEN LENGTH(A.CN) < 3 THEN LPAD(A.CN,3,0) 
@@ -19,4 +19,42 @@
 		        FROM CUS) A
 	</select>
 	
+	<!-- 고객(CUS) 등록 -->
+	<insert id="createPost" parameterType="cusVO">
+		<selectKey resultType="String" order="BEFORE" keyProperty="cusNum">
+			SELECT A.FRONT||
+<![CDATA[			CASE WHEN LENGTH(A.CN)<3 THEN LPAD(A.CN,3,0) 	]]>
+		            ELSE TO_CHAR(A.CN) END AS CUS_NUM
+		       FROM (SELECT NVL(SUBSTR(MAX(CUS_NUM), 1, 3), 'CUS') AS FRONT, NVL(SUBSTR(MAX(CUS_NUM), 4), 0)+1 AS CN
+		               FROM CUS) A
+		</selectKey>
+		INSERT INTO CUS(
+			    CUS_NUM, 
+			    CUS_NM, CUS_ADDR, CUS_PHE, POSTNO, 
+			    ADDR_DET, CUS_BIR, HOBBY, GENDER, NATIONALITY
+		)VALUES(
+			    #{cusNum},
+			     #{cusNm}, #{cusAddr}, #{cusPhe}, #{postNo}, 
+			     #{addrDet}, #{cusBir}, #{hobby}, #{gender}, #{nationality}
+		)
+	</insert>
+	
+	<!-- 소유자동차(CAR) 등록. 다중 insert시 update 태그를 사용함 
+		드루와 : List<CarVO> carVOList
+		가즈아 : insert, update, delete의 경우 resultType을 생략
+	-->
+	<update id="createPostCar" parameterType="java.util.List">
+		<foreach collection="list" item="carVO" open="INSERT ALL" 
+					close="SELECT * FROM DUAL" separator=" ">
+			INTO CAR(CAR_NUM, MNF_NUM, DT, DIST, CUS_NUM)
+			    VALUES(#{carVO.carNum}, #{carVO.mnfNum}, #{carVO.dt}, #{carVO.dist}, #{carVO.cusNum})
+		</foreach>
+	</update>
+	
+	<select id="detail" parameterType="cusVO" resultType="cusVO">
+		SELECT CUS_NUM, CUS_NM, CUS_ADDR, CUS_PHE, POSTNO, 
+		       ADDR_DET, CUS_BIR, HOBBY, GENDER, NATIONALITY
+		FROM CUS
+		WHERE cus_Num=#{cusNum}
+	</select>
 </mapper>

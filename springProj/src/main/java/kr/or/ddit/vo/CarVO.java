@@ -1,9 +1,10 @@
 package kr.or.ddit.vo;
 
-import java.sql.Date;
+import java.util.Date;
 import java.util.List;
 
 import org.hibernate.validator.constraints.NotBlank;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import lombok.Data;
 
@@ -13,7 +14,7 @@ public class CarVO {
 	private String carNum;	// 자동차 번호
 	@NotBlank
 	private String mnfNum;	// 제조 번호
-	
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private Date dt;		// 연식
 	
 	private int dist;		// 주행 거리

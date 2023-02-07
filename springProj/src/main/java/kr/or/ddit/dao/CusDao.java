@@ -10,7 +10,7 @@ public class CusDao {
 	@Autowired
 	SqlSessionTemplate sqlSessionTemplate;
 
-	public String makeCusNum() {
-		return sqlSessionTemplate.selectOne("cus.makeCusNum");
+	public String getCusNum() {
+		return sqlSessionTemplate.selectOne("cus.getCusNum");
 	}
 }

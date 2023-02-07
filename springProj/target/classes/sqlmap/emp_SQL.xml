@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- namespace : xml파일이 여러개일 수 있으므로 
+	이를 구별하기 위한 식별 용도로 사용
+-->
+<mapper namespace="kr.or.ddit.mapper.EmpMapper">
+	
+	<!-- 다음 직원번호를 가져옴 -->
+	<select id="getEmpNum" resultType="String">
+		SELECT A.FRONT||
+		<![CDATA[
+		       CASE WHEN LENGTH(A.EN) < 3 THEN LPAD(A.EN,3,0) 
+	       ]]>
+		       ELSE TO_CHAR(A.EN) END AS EMP_NUM
+		FROM (SELECT NVL(SUBSTR(MAX(EMP_NUM), 1, 3), 'EMP') AS FRONT, 
+					 NVL(SUBSTR(MAX(EMP_NUM), 4), 0)+1 AS EN
+		        FROM EMP) A
+	</select>
+
+	<insert id="createPost" parameterType="empVO">
+		<selectKey resultType="String" order="BEFORE" keyProperty="empNum">
+			SELECT A.FRONT||
+<![CDATA[		CASE WHEN LENGTH(A.EN) < 3 THEN LPAD(A.EN,3,0) 		       ]]>
+		       	ELSE TO_CHAR(A.EN) END AS EMP_NUM
+		FROM (SELECT NVL(SUBSTR(MAX(EMP_NUM), 1, 3), 'EMP') AS FRONT, 
+					 NVL(SUBSTR(MAX(EMP_NUM), 4), 0)+1 AS EN
+		        FROM EMP) A
+		</selectKey>
+		INSERT INTO EMP(
+			    EMP_NUM, EMP_ADDR, EMP_PNE, EMP_NM, EMP_PAY
+			    <if test="empMjNum!=null and empMjNum!=''">
+			    , EMP_MJ_NUM
+			    </if>
+		)VALUES(
+			    #{empNum}, #{empAddr}, #{empPne}, #{empNm}, #{empPay}
+			    <if test="empMjNum!=null and empMjNum!=''">
+			    , #{empMjNum}
+			    </if>
+		)
+	</insert>
+	
+	<!-- 모든 직원 정보 가져오기 -->
+	<select id="getEmpAll" resultType="empVO">
+		SELECT EMP_NUM, EMP_ADDR, EMP_PNE, EMP_NM, EMP_PAY, EMP_MJ_NUM
+		FROM EMP
+		ORDER BY EMP_NUM
+	</select>
+	
+</mapper>
