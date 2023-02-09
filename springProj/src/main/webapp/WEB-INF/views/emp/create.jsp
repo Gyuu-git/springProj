@@ -88,22 +88,22 @@ $(function() {
 		<label for="empNum" class="form-label">직원번호</label>
 <!--     	<input type="text" name="empNum" class="form-control" id="empNum" -->
 <%--     			value="${empNum}" placeholder="직원번호를 검색해주세요" /> --%>
-<%-- 		<form:input path="empNum" class="form-control" /> --%>
+		<form:input path="empNum" class="form-control" />
 		<input type="text" name="empNum" class="form-control" id="empNumAjax"
-    			value="" placeholder="우편번호를 검색해주세요" />
+    			value="" placeholder="우편번호를 검색해주세요" readonly />
 	</div>
 	<!-- 직원번호 끝 -->
 	<!-- 주소 시작 -->
 	<div class="col-md-2">
     	<label for="zipCode" class="form-label">우편번호</label>
     	<input type="text" name="zipCode" class="form-control" id="zipCode"
-    			placeholder="우편번호를 검색해주세요" />
+    			placeholder="우편번호를 검색해주세요" readonly />
     	<button type="button" class="btn btn-primary" onclick="openHomeSearch()">검색</button>
 	</div>
 	<div class="col-12">
 		<label for="address" class="form-label">주소</label>
 		<input type="text" name="address" class="form-control" id="address" 
-				placeholder="주소를 검색해주세요">
+				placeholder="주소를 검색해주세요" readonly />
 	</div>
 	<div class="col-12">
 		<label for="detAddress" class="form-label">상세주소</label>
@@ -135,9 +135,9 @@ $(function() {
 	<!-- 매니저 등록 시작 -->
 	<div class="col-md-6">
 		<label for="empMjNm" class="form-label">매니저명</label>
-		<input type="text" name="empMjNum" class="form-control" id="empMjNum" />
+		<input type="hidden" name="empMjNum" class="form-control" id="empMjNum" />
 		<input type="text" class="form-control" id="empMjNm"
-				placeholder="직원명을 입력해주세요" />
+				placeholder="직원명을 입력해주세요" readonly />
 		<button type="button" class="btn btn-primary" id="btnEmpMjNum" 
 				data-toggle="modal" data-target="#exampleModal" >검색</button>
 	</div>

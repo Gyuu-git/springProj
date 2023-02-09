@@ -23,6 +23,10 @@ public class EmpVO {
 	private int empPay;		// 급여
 	
 	private String empMjNum;// 매니저
+
+	private String empMjNm;	// 매니저 명
+	
+	private int rnum;		// 행 번호
 	
 	// 직원(EMP) : 서비스(SER) = 1 : N
 	private List<SerVO> serVOList;

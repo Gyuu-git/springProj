@@ -3,7 +3,7 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="tiles" uri="http://tiles.apache.org/tags-tiles" %>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class>
 
 <head>
 <script type="text/javascript" src="/resources/js/jquery-3.6.0.js"></script>
@@ -19,7 +19,7 @@
     <link href="/resources/sbadmin2/css/sb-admin-2.min.css" rel="stylesheet">
 </head>
 
-<body id="page-top">
+<body id="page-top" class="sidebar-mini sidebar-closed sidebar-collapse">
 
     <!-- Page Wrapper -->
     <div id="wrapper">
