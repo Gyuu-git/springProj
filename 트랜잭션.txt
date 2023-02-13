@@ -1,0 +1,10 @@
+	<!-- 트랜잭선 관리자의 빈을 정의함 -->
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	
+	<!-- 어노테이션 기반의 트랜잭션 제어를 활성화함 -->
+	<tx:annotation-driven/>
+
+root-context.xml에 추가
+ServiceImpl 메서드 위에 @Transactional 어노테이션 추가

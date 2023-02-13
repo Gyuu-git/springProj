@@ -1,3 +1,6 @@
 	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
 		<property name="basePackage" value="kr.or.ddit.mapper" />
 	</bean>
+
+root-context.xml에 추가
+dao대신 Mapper 클래스를 만들어 사용 가능
