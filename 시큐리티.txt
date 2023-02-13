@@ -1,0 +1,65 @@
+https://mvnrepository.com
+
+pom.xml
+
+spring-security-web 검색 > Spring Security Web (첫번째) > 5.0.7
+spring-security-config 검색 > Spring Security Config (첫번째) > 5.0.7
+spring-security-core 검색 > Spring Security Core (첫번째) > 5.0.7
+spring-security-taglibs 검색 > Spring Security Taglibs (첫번째) > 5.0.7
+의존성 추가
+
+web.xml
+
+(맨위) context-param > param-value에 /WEB-INF/spring/security-context.xml (시큐리티 설정 xml파일 경로) 추가
+
+예외처리 (error-page) 위에 
+
+	<filter>
+		<filter-name>springSecurityFilterChain</filter-name>
+		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>springSecurityFilterChain</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+추가
+
+
+
+WEB-INF > spring 폴더에 security-context.xml 파일 생성 (web.xml에 추가했던 경로/파일명이랑 똑같이)
+(상세 설정은 프로젝트 안의 파일 참조)
+
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+   xmlns:security="http://www.springframework.org/schema/security"
+   xsi:schemaLocation="http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd
+      http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<security:http>
+		<!-- patter : URL 패턴
+		Role : 권한(authorization)
+		permitAll : 누구랑 접근 가능 / hasRole : 권한을 갖은자인가?
+		-->
+		<security:intercept-url pattern="/board/list" access="permitAll"/>
+		<security:intercept-url pattern="/board/register" access="hasRole('ROLE_MEMBER')"/>
+		
+		<!-- 기본 로그인 페이지 -->
+		<security:form-login/>
+
+		<!-- error-page : 접근거부 처리자의 URI -->
+		<security:access-denied-handler error-page="/accessError"/>
+	</security:http>
+
+	<security:authentication-manager>
+		<security:authentication-provider>
+			<security:user-service>
+				<!-- 접근 허용할 id, pass, 권한 설정 -->
+				<security:user name="member" password="{noop}1234" authorities="ROLE_MEMBER"/>
+				<security:user name="admin" password="{noop}1234" authorities="ROLE_ADMIN"/>
+			</security:user-service>
+		</security:authentication-provider>
+	</security:authentication-manager>
+</beans>
+
