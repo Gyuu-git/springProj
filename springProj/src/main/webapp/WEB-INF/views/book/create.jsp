@@ -1,4 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -47,8 +48,10 @@ $(function() {
 요청 URI : /create?title=개똥이글로리&category=소설&price=10000
 요청 파라미터 : title=개똥이글로리&category=소설&price=10000
 요청 방식 : post
+
+스프링 시큐리티를 사용할 경우 action 경로 뒤에 csrf토큰을 입력해야 함.(multipart/form-data로 전송할 경우에만)
  -->
-<form action="/create" method="post" enctype="multipart/form-data">
+<form action="/create?${_csrf.parameterName}=${_csrf.token}" method="post" enctype="multipart/form-data">
 	<!-- 폼 데이터 -->
 	<div class="imgs_wrap"></div><br />
 	<p>제목 : <input type="text" name="title" required /></p>
@@ -62,6 +65,7 @@ $(function() {
 		<input type="submit" value="저장" />
 		<input type="button" value="목록" />
 	</p>
+	<sec:csrfInput/>
 </form>
 
 <script type="text/javascript">

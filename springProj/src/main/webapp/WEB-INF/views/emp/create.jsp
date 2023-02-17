@@ -29,6 +29,9 @@ $(function() {
 	$.ajax({
 		url: "/emp/getEmpNum",
 		type: "post",
+		beforeSend : function(xhr) {   // 데이터 전송 전  헤더에 csrf값 설정
+			xhr.setRequestHeader("${_csrf.headerName}", "${_csrf.token}");
+		},
 		success: function(result) {
 			console.log("result: " + result);
 			$("#empNumAjax").val(result);
@@ -41,6 +44,9 @@ $(function() {
 			url: "/emp/getEmpAll",
 			type: "post",
 			dataType: "json",
+			beforeSend : function(xhr) {   // 데이터 전송 전  헤더에 csrf값 설정
+				xhr.setRequestHeader("${_csrf.headerName}", "${_csrf.token}");
+			},
 			success: function (result) {
 				// result : List<EmpVO> empVOList
 				var html = "";
@@ -88,7 +94,7 @@ $(function() {
 		<label for="empNum" class="form-label">직원번호</label>
 <!--     	<input type="text" name="empNum" class="form-control" id="empNum" -->
 <%--     			value="${empNum}" placeholder="직원번호를 검색해주세요" /> --%>
-		<form:input path="empNum" class="form-control" />
+<%-- 		<form:input path="empNum" class="form-control" /> --%>
 		<input type="text" name="empNum" class="form-control" id="empNumAjax"
     			value="" placeholder="우편번호를 검색해주세요" readonly />
 	</div>

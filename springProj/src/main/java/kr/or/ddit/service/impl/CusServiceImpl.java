@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import kr.or.ddit.mapper.CusMapper;
 import kr.or.ddit.service.CusService;
@@ -30,6 +31,7 @@ public class CusServiceImpl implements CusService {
 	}
 	
 	// 고객(CUS) + 소유자동차(CAR) 등록
+	@Transactional
 	@Override
 	public int createPost(CusVO cusVO) {
 		int result = 0;

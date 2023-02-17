@@ -206,6 +206,13 @@
 		</dependency>
 		<!-- tiles  끝  -->
 		
+		<!-- https://mvnrepository.com/artifact/com.googlecode.json-simple/json-simple -->
+		<dependency>
+		    <groupId>com.googlecode.json-simple</groupId>
+		    <artifactId>json-simple</artifactId>
+		    <version>1.1.1</version>
+		</dependency>
+		
 		<!-- json 데이터 바인딩을 위한 의존 라이브러리 -->
 		<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
 		<dependency>
@@ -264,6 +271,40 @@
 		    <version>5.4.2.Final</version>
 		</dependency>
 		<!-- 입력값을 검증하기 위한 라이브러리 의존 관계 정의  끝  -->
+		
+		<!-- 스프링 시큐리티 라이브러리 의존관계 정의 시작 -->
+		<!-- 스프링 시큐리티를 웹에서 동작하도록 해줌 -->
+		<!-- https://mvnrepository.com/artifact/org.springframework.security/spring-security-web -->
+		<dependency>
+		    <groupId>org.springframework.security</groupId>
+		    <artifactId>spring-security-web</artifactId>
+		    <version>5.0.7.RELEASE</version>
+		</dependency>
+		
+		<!-- 스프링 시큐리티 설정을 도와줌 -->
+		<!-- https://mvnrepository.com/artifact/org.springframework.security/spring-security-config -->
+		<dependency>
+		    <groupId>org.springframework.security</groupId>
+		    <artifactId>spring-security-config</artifactId>
+		    <version>5.0.7.RELEASE</version>
+		</dependency>
+		
+		<!-- 스프링 시큐리티 일반 기능 -->
+		<!-- https://mvnrepository.com/artifact/org.springframework.security/spring-security-core -->
+		<dependency>
+		    <groupId>org.springframework.security</groupId>
+		    <artifactId>spring-security-core</artifactId>
+		    <version>5.0.7.RELEASE</version>
+		</dependency>
+		
+		<!-- 스프링 시큐리티와 태그 라이브러리를 연결해줌 -->
+		<!-- https://mvnrepository.com/artifact/org.springframework.security/spring-security-taglibs -->
+		<dependency>
+		    <groupId>org.springframework.security</groupId>
+		    <artifactId>spring-security-taglibs</artifactId>
+		    <version>5.0.7.RELEASE</version>
+		</dependency>
+		<!-- 스프링 시큐리티 라이브러리 의존관계 정의  끝  -->
 	</dependencies>
     <build>
         <plugins>

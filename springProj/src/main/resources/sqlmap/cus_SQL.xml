@@ -51,10 +51,35 @@
 		</foreach>
 	</update>
 	
-	<select id="detail" parameterType="cusVO" resultType="cusVO">
-		SELECT CUS_NUM, CUS_NM, CUS_ADDR, CUS_PHE, POSTNO, 
-		       ADDR_DET, CUS_BIR, HOBBY, GENDER, NATIONALITY
-		FROM CUS
-		WHERE cus_Num=#{cusNum}
+	<!-- 고객 : 자동차 = 1 : N -->
+	<resultMap type="carVO" id="carMap">
+		<result property="carNum" column="CAR_NUM" />
+		<result property="mnfNum" column="MNF_NUM" />
+		<result property="dt" column="DT" />
+		<result property="dist" column="DIST" />
+		<result property="cusNum" column="CUS_NUM" />
+	</resultMap>
+
+	<resultMap type="cusVO" id="cusMap">
+		<result property="cusNum" column="CUS_NUM" />
+		<result property="cusNm" column="CUS_NM" />
+		<result property="cusAddr" column="CUS_ADDR" />
+		<result property="cusPhe" column="CUS_PHE" />
+		<result property="postNo" column="POSTNO" />
+		<result property="addrDet" column="ADDR_DET" />
+		<result property="cusBir" column="CUS_BIR" />
+		<result property="hobby" column="HOBBY" />
+		<result property="gender" column="GENDER" />
+		<result property="nationality" column="NATIONALITY" />
+		<collection property="carVOList" resultMap="carMap" />
+	</resultMap>
+	
+	<!-- 고객 상세보기 -->
+	<select id="detail" parameterType="cusVO" resultMap="cusMap">
+		SELECT A.CUS_NUM, A.CUS_NM, A.CUS_ADDR, A.CUS_PHE, A.POSTNO, A.ADDR_DET, A.HOBBY, A.GENDER, A.NATIONALITY, A.CUS_BIR,
+		        B.CAR_NUM, B.MNF_NUM, B.DT, B.DIST
+		FROM CUS A LEFT OUTER JOIN CAR B ON(A.CUS_NUM = B.CUS_NUM)
+		WHERE A.CUS_NUM = #{cusNum}
 	</select>
+	
 </mapper>

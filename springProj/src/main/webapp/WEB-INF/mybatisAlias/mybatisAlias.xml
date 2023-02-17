@@ -18,7 +18,10 @@
       <typeAlias type="kr.or.ddit.vo.LprodVO" alias="lprodVO" />
       <typeAlias type="kr.or.ddit.vo.AttachVO" alias="attachVO" />
       <typeAlias type="kr.or.ddit.vo.CusVO" alias="cusVO" />
+      <typeAlias type="kr.or.ddit.vo.CarVO" alias="carVO" />
       <typeAlias type="kr.or.ddit.vo.EmpVO" alias="empVO" />
+      <typeAlias type="kr.or.ddit.vo.MemVO" alias="memVO" />
+      <typeAlias type="kr.or.ddit.vo.MemAuthVO" alias="memAuthVO" />
    </typeAliases>
    
 </configuration>

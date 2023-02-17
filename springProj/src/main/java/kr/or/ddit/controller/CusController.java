@@ -1,6 +1,7 @@
 package kr.or.ddit.controller;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -124,15 +125,17 @@ public class CusController {
 	public String detail(Model model, RedirectAttributes ras, @ModelAttribute CusVO cusVO) {
 		
 		// 상세보기
-		CusVO sel_cus = this.cusService.detail(cusVO);
-		log.info("sel_cus : " + sel_cus);
+		cusVO = this.cusService.detail(cusVO);
+		log.info("cusVO : " + cusVO);
 		
-		cusVO.setCusNum(sel_cus.getCusNum());
-		cusVO.setCusNm(sel_cus.getCusNm());
-		cusVO.setCusAddr(sel_cus.getCusAddr());
-		cusVO.setCusBir(sel_cus.getCusBir());
-		cusVO.setCusPhe(sel_cus.getCusPhe());
-		cusVO.setGender(sel_cus.getGender());
+		// Muslic, Sports,
+		String hobby = cusVO.getHobby();
+		String[] hobbyArray = hobby.split(",");
+		List<String> hobbyList = new ArrayList<String>();
+		for(int i = 0; i < hobbyArray.length; i++) {
+			hobbyList.add(hobbyArray[i]);
+		}
+		cusVO.setHobbyList(hobbyList);
 		
 		// 국적(한개 선택) -> select 박스
 		Map<String, String> nationalityMap = new HashMap<>();
@@ -141,6 +144,7 @@ public class CusController {
 		nationalityMap.put("Germany", "Germany");
 		
 		model.addAttribute("nationalityMap", nationalityMap);
+		model.addAttribute("cusVO", cusVO);
 		
 		// forwarding
 		return "cus/detail";

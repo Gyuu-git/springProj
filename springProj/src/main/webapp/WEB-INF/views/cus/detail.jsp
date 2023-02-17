@@ -31,7 +31,7 @@
 요청 방식 : post
 -->
 <form:form modelAttribute="cusVO" action="/cus/createPost" method="post">
-	<div class="bd-example">
+ 	<div class="bd-example">
 		<div class="mb-3">
 			<label for="cusNum" class="form-label">고객번호</label>
 <!-- 			<input type="text" class="form-control" id="cusNum"  -->
@@ -86,6 +86,7 @@
 			<form:errors path="cusBir" style="color: red;" />
 		</div>
 		<div class="mb-3">
+			<!-- path : id="hobbyList" name="hobbyList" -->
 			<label for="cusBir" class="form-label">취미</label>
 			<form:checkbox path="hobbyList" value="Music" label="Music" />
 			<form:checkbox path="hobbyList" value="Movie" label="Movie" />
@@ -108,28 +109,23 @@
 					소유자동차
 				</div>
 				<ul class="list-group list-group-flush">
-					<li class="list-group-item">
-						<input type="hidden" name="carVOList[0].cusNum" value="${cusNum}" />
-						<input type="text" class="form-control" name="carVOList[0].carNum"
-								style="width:25%;float:left;" placeholder="자동차번호" required />
-			            <input type="text" class="form-control" name="carVOList[0].mnfNum"
-			            		style="width:25%;float:left;" placeholder="제조 번호" required />
-			            <input type="date" class="form-control" name="carVOList[0].dt"
-			            		style="width:25%;float:left;" placeholder="연식" required />
-			            <input type="text" class="form-control" name="carVOList[0].dist"
-			            		style="width:25%;float:left;" placeholder="주행거리" required />
-					</li>
-					<li class="list-group-item">
-						<input type="hidden" name="carVOList[1].cusNum" value="${cusNum}" />
-						<input type="text" class="form-control" name="carVOList[1].carNum"
-								style="width:25%;float:left;" placeholder="자동차번호" required />
-			            <input type="text" class="form-control" name="carVOList[1].mnfNum"
-			            		style="width:25%;float:left;" placeholder="제조 번호" required />
-			            <input type="date" class="form-control" name="carVOList[1].dt"
-			            		style="width:25%;float:left;" placeholder="연식" required />
-			            <input type="text" class="form-control" name="carVOList[1].dist"
-			            		style="width:25%;float:left;" placeholder="주행거리" required />
-					</li>
+					<c:forEach var="carVO" items="${cusVO.carVOList}" varStatus="stat">
+						<li class="list-group-item">
+							<input type="hidden" name="carVOList[${stat.index}].cusNum" value="${cusNum}" />
+							<input type="text" class="form-control" name="carVOList[${stat.index}].carNum"
+									value="${carVO.carNum}"
+									style="width:25%;float:left;" placeholder="자동차번호" required />
+				            <input type="text" class="form-control" name="carVOList[${stat.index}].mnfNum"
+									value="${carVO.mnfNum}"
+				            		style="width:25%;float:left;" placeholder="제조 번호" required />
+				            <input type="date" class="form-control" name="carVOList[${stat.index}].dt"
+									value="${carVO.dt}"
+				            		style="width:25%;float:left;" placeholder="연식" required />
+				            <input type="text" class="form-control" name="carVOList[${stat.index}].dist"
+									value="${carVO.dist}"
+				            		style="width:25%;float:left;" placeholder="주행거리" required />
+						</li>
+					</c:forEach>
 				</ul>
 			</div>
 		</div>

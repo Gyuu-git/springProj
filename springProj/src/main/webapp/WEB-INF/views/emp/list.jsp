@@ -241,6 +241,9 @@ $(function () {
 			data : JSON.stringify(data),
 			dataType: "json",
 			type: "post",
+			beforeSend : function(xhr) {   // 데이터 전송 전  헤더에 csrf값 설정
+				xhr.setRequestHeader("${_csrf.headerName}", "${_csrf.token}");
+			},
 			success: function (result) {
 				console.log("result : " + JSON.stringify(result));
 				

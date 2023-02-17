@@ -3,8 +3,10 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:beans="http://www.springframework.org/schema/beans"
 	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:security="http://www.springframework.org/schema/security"
 	xsi:schemaLocation="http://www.springframework.org/schema/mvc https://www.springframework.org/schema/mvc/spring-mvc.xsd
 		http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd
 		http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
 
 	<!-- DispatcherServlet Context: defines this servlet's request-processing infrastructure -->
@@ -46,6 +48,17 @@
 		<beans:property name="order" value="1" /> 
 	</beans:bean>
 	<!-- tiles 설정  끝  -->
+	
+	<!-- 스프링 시큐리티 애너테이션을 활성화 
+		- Secured : 스프링 시큐리티 모듈을 지원하기 위한 애너테이션
+		- PreAuthorize : 메서드가 실행되기 전에 적용할 접근 정책을 지정할 때 사용
+		- PostAuthorize : 메서드가 실행된 후에 적용할 접근 정책을 지정할 때 사용
+		
+		pre-post-annotations="enabled" : PreAuthorize, PostAuthorize를 사용할 수 있게 됨
+		secured-annotations="enabled" : Secured를 사용할 수 있게 됨
+	-->
+	<security:global-method-security 
+		pre-post-annotations="enabled" secured-annotations="enabled" />
 	
 	<context:component-scan base-package="kr.or.ddit" />
 	
